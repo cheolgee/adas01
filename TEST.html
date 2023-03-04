@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src = "https://d3js.org/d3.v6.min.js"></script>  
+        <style>
+            body {
+                font-family: "Helvetica Neue", Helvetica, sans-serif;
+                font-size: 14px;
+            }
+            .person{
+                height:20px;
+                position: relative;
+            }
+            .person .label{
+                width: 90px;
+                text-align: right;
+            }
+
+            .person .bar{
+                height:19px;
+                background-color: steelblue;
+                position: absolute;
+                left:100px;
+            }
+
+            .person div {
+                display: inline-block;
+            }
+
+            .menu {
+                margin-top: 20px;
+            }
+
+            body {
+            font-family: "Helvetica Neue", Helvetica, sans-serif;
+            font-size: 12px;
+            }
+            rect {
+                fill: #ccc;
+                cursor: pointer;
+            }
+            .info {
+                margin-left: 20px;
+            }
+
+
+        </style>
+    </head>
+    
+    <body>
+
+        <div id="wrapper">
+            <svg width="800" height="100"></svg>
+            <g id="wrapper1" transform="translate(40, 40)">
+            </g>
+          </svg>
+        </div>
+      
+        <div class="menu">
+          <button onClick="sort();">Sort</button>
+        </div>
+
+        <div >
+            <svg width="800" height="80">
+                <g id="wrapper2" transform="translate(40, 40)">
+                </g>
+              </svg>
+              
+        </div>
+
+        <svg width="1000" height="80">
+            <g transform="translate(20, 10)">
+              <g class="axis" transform="translate(0, 40)"></g>
+              <rect class="click-area"></rect>
+            </g>
+          </svg>
+          
+        <div class="info">Click on the grey band</div>
+          
+        <script>
+            myData = [
+                        {  "name": "Andy","score": 1},
+                        {   "name": "Beth","score": 10},
+                        {   "name": "Craig","score": 25},
+                        {   "name": "Diane","score": 40},
+                        {   "name": "Evelyn","score": 80}
+                    ];
+            var barWidth = 400;
+            var varScale = d3.scaleLinear().domain([0,100]).range([0,400]);
+            d3.select('#wrapper1').selectAll('.person')
+            .data(myData)
+            .enter()
+            .append('div')
+            .classed('person',true)
+            .append('div')
+            .classed('label',true)
+            .text(function(d){return d.name})
+            .append('div')
+            .classed('bar',true)
+            .style('width',function(d){return varScale(d.score)+'px';})
+            ;
+
+            function sort(){
+                d3.selectAll('.person')
+                .sort(function(a,b){return b.score - a.score;});
+            }
+
+            let myScale= d3.scaleLinear().domain([0,100])       
+            .range([0,800])
+            ;
+
+            console.log(myScale(0),myScale(50),myScale(100));
+
+/*
+            var myData2 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+
+            let myScaleLinear = d3.scaleLinear().domain([0,100]).range([0,100]);
+            let myScaleSqurt = d3.scaleSqrt().domain([0,100]).range([0,30]);
+
+            d3.select('#wrapper2').selectAll('circle')
+            .data(myData2)
+            .join('circle')
+            .attr('cx',function(d){ return myScaleLinear(d);})
+            .attr('r',function(d){ return myScaleSqurt(d);})
+            .style('fill', '#888')
+            ;
+*/
+
+            var linearScale = d3.scaleLinear()
+	.domain([0, 100])
+	.range([0, 700]);
+
+var sqrtScale = d3.scaleSqrt()
+	.domain([0, 100])
+	.range([0, 30]);
+
+var myData2 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+
+d3.select('#wrapper2')
+	.selectAll('circle')
+	.data(myData2)
+	.join('circle')
+	.attr('r', function(d) {
+		return sqrtScale(d);
+	})
+	.attr('cx', function(d) {
+		return linearScale(d);
+	})
+    .attr('cy', 8)
+    ;
+
+////////////////////////////////////////////////////
+    var width = 600;
+
+    var linearScale = d3.scaleLinear()
+    .domain([-50,50])
+    .range([0,width]);
+    //.nice();
+
+    var clickArea = d3.select('.click-area').node();
+    console.log('aaaaaaaaa:'+ clickArea);
+
+    function doClick(e){
+        var pos = d3.pointer(e,clickArea);
+        var xPos = pos[0];
+        var value = linearScale.invert(xPos);
+        d3.select('.info')
+        .text('you clicked' + value.toFixed(2));
+    }
+
+    var axis = d3.axisBottom(linearScale);
+    d3.select('.axis').call(axis);
+
+    d3.select('.click-area')
+    .attr('width',width)
+    .attr('height',40)
+    .on('click',doClick)
+    ;
+
+
+    </script>
+
+    </body>
+
+    </html>
